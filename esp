@@ -1,1 +1,200 @@
---esp--
+-- Settings
+local ESP = {
+    Enabled = false,
+    Highlight = true, -- Change to enable highlighting
+    HighlightColor = Color3.fromRGB(255, 0, 0), -- Set the highlight color
+    Objects = setmetatable({}, {__mode="kv"}),
+}
+
+-- Declarations
+local cam = workspace.CurrentCamera
+local plrs = game:GetService("Players")
+local plr = plrs.LocalPlayer
+
+-- Functions
+local function Draw(obj, props)
+    local new = Drawing.new(obj)
+    
+    props = props or {}
+    for i, v in pairs(props) do
+        new[i] = v
+    end
+    return new
+end
+
+function ESP:Toggle(bool)
+    self.Enabled = bool
+    if not bool then
+        for obj, highlight in pairs(self.Objects) do
+            if highlight.Type == "Highlight" then
+                highlight:Remove()
+            end
+        end
+    end
+end
+
+local highlightBase = {}
+highlightBase.__index = highlightBase
+
+function highlightBase:Remove()
+    ESP.Objects[self.Object] = nil
+    self.Component.Visible = false
+end
+
+function highlightBase:Update()
+    if not self.PrimaryPart or not self.Object:IsDescendantOf(workspace) then
+        self:Remove()
+        return
+    end
+
+    -- Update the highlight position and color
+    local cf = self.PrimaryPart.CFrame
+    local position, visible = cam:WorldToViewportPoint(cf.p)
+    if visible then
+        self.Component.Visible = true
+        self.Component.Position = Vector2.new(position.X, position.Y)
+        self.Component.Color = self.Color
+    else
+        self.Component.Visible = false
+    end
+end
+
+function ESP:Add(obj, options)
+    if not obj.Parent then
+        return warn(obj, "has no parent")
+    end
+
+    local highlight = setmetatable({
+        Name = options.Name or obj.Name,
+        Type = "Highlight",
+        Color = options.Color or self.HighlightColor, -- Set the initial highlight color
+        Object = obj,
+        PrimaryPart = options.PrimaryPart or obj:IsA("BasePart") and obj or nil,
+        Component = Draw("Circle", {
+            Thickness = 2,
+            NumSides = 50,
+            Radius = options.Radius or (obj:IsA("BasePart") and obj.Size.magnitude or 5), -- You can adjust the radius
+            Filled = false,
+            Color = self.HighlightColor,
+            Visible = false,
+        }),
+    }, highlightBase)
+
+    if self:GetBox(obj) then
+        self:GetBox(obj):Remove()
+    end
+
+    box.Components["Highlight"] = Draw("Quad", {
+        Thickness = self.Thickness,
+        Color = self.HighlightColor, -- Set the initial highlight color
+        Transparency = 0.5, -- You can adjust the transparency as needed
+        Filled = true, -- Change to true if you want a filled highlight
+        Visible = self.Enabled and self.Highlighted == obj -- Only show the highlight when it's highlighted
+    })
+    
+    self.Objects[obj] = highlight
+
+    if self:GetBox(obj) then
+        self:GetBox(obj):Remove()
+    end
+
+    box.Components["Quad"] = Draw("Quad", {
+        Thickness = self.Thickness,
+        Color = color,
+        Transparency = 1,
+        Filled = false,
+        Visible = self.Enabled and self.Boxes
+    })
+    box.Components["Name"] = Draw("Text", {
+		Text = box.Name,
+		Color = box.Color,
+		Center = true,
+		Outline = true,
+        Size = 19,
+        Visible = self.Enabled and self.Names
+	})
+	box.Components["Distance"] = Draw("Text", {
+		Color = box.Color,
+		Center = true,
+		Outline = true,
+        Size = 19,
+        Visible = self.Enabled and self.Names
+	})
+	
+	box.Components["Tracer"] = Draw("Line", {
+		Thickness = ESP.Thickness,
+		Color = box.Color,
+        Transparency = 1,
+        Visible = self.Enabled and self.Tracers
+    })
+    self.Objects[obj] = box
+    
+    obj.AncestryChanged:Connect(function(_, parent)
+        if parent == nil and ESP.AutoRemove ~= false then
+            box:Remove()
+        end
+    end)
+    obj:GetPropertyChangedSignal("Parent"):Connect(function()
+        if obj.Parent == nil and ESP.AutoRemove ~= false then
+            box:Remove()
+        end
+    end)
+
+    local hum = obj:FindFirstChildOfClass("Humanoid")
+	if hum then
+        hum.Died:Connect(function()
+            if ESP.AutoRemove ~= false then
+                box:Remove()
+            end
+		end)
+    end
+
+    return highlight
+end
+
+local function CharAdded(char)
+    local p = plrs:GetPlayerFromCharacter(char)
+    if not char:FindFirstChild("HumanoidRootPart") then
+        local ev
+        ev = char.ChildAdded:Connect(function(c)
+            if c.Name == "HumanoidRootPart" then
+                ev:Disconnect()
+                ESP:Add(char, {
+                    Name = p.Name,
+                    Player = p,
+                    PrimaryPart = c
+                })
+            end
+        end)
+    else
+        ESP:Add(char, {
+            Name = p.Name,
+            Player = p,
+            PrimaryPart = char.HumanoidRootPart
+        })
+    end
+end
+local function PlayerAdded(p)
+    p.CharacterAdded:Connect(CharAdded)
+    if p.Character then
+        coroutine.wrap(CharAdded)(p.Character)
+    end
+end
+plrs.PlayerAdded:Connect(PlayerAdded)
+for i,v in pairs(plrs:GetPlayers()) do
+    if v ~= plr then
+        PlayerAdded(v)
+    end
+end
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    cam = workspace.CurrentCamera
+    for i,v in (ESP.Enabled and pairs or ipairs)(ESP.Objects) do
+        if v.Update then
+            local s,e = pcall(v.Update, v)
+            if not s then warn("[EU]", e, v.Object:GetFullName()) end
+        end
+    end
+end)
+
+return ESP
