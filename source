@@ -2110,9 +2110,9 @@ local Aimlock = loadstring(game:HttpGet("https://raw.githubusercontent.com/Bacon
 local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/BaconArsenalGod/Aimlock/main/esp"))()
 ESP:Toggle(false)
 ESP.Highlight = true
-ESP.Names = false
 Aiming.TeamCheck(false)
 Aiming.VisibleCheck = false
+Aimlock:Toggle(false)
 
 -- // Dependencies
 
@@ -2422,6 +2422,7 @@ end)
 
 AimTab:AddSwitch("Aimlock (t)", function(bool)
     Settings.Aimlock = bool
+	Aimlock:Toggle(bool)
 end)
 
 ALTab:AddSwitch("Webhook Mode", function(bool)
@@ -2480,9 +2481,9 @@ end)
 AimTab:AddSlider("SmoothnessAmount", function(value)
     Aimlock.SmoothnessAmount = value
     {
-        ["min"] = 0,
+        ["min"] = 1,
         ["max"] = 10,
-        ["readonly"] = false
+        ["readonly"] = true
     }
 end)
 AimTab:AddSwitch("Smoothness", function(bool)
