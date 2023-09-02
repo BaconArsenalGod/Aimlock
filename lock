@@ -1,4 +1,4 @@
-local Aimlock = {
+getgenv().Aimlock = {
     Enabled = false,
     OldAimPart = "HumanoidRootPart",
     AimPart = "HumanoidRootPart",
