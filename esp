@@ -123,7 +123,8 @@ for _, player in pairs(plrs:GetPlayers()) do
     end
 end
 
-game:GetService("RunService").RenderStepped:Connect(function()
+-- Continuous update loop for ESP
+while true do
     for _, highlight in pairs(ESP.Objects) do
         if highlight.Type == "Highlight" and highlight.Update then
             local success, error = pcall(highlight.Update, highlight)
@@ -132,6 +133,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
             end
         end
     end
-end)
+    wait(0.1) -- Adjust the delay here as needed for performance
+end
 
-return ESP
+-- The code above will keep updating the ESP highlights every 0.1 seconds.
