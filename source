@@ -2328,7 +2328,7 @@ ALTab:AddSwitch("Aimbot", function(bool)
     Settings.Aimbot = bool
 end)
 
-AimTab:AddSwitch("Aimlock (t)-- does not work rn currently being worked on", function(bool)
+AimTab:AddSwitch("Aimlock (t)", function(bool)
     Settings.Aimlock = bool
 end)
 
