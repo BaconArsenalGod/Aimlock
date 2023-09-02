@@ -1,22 +1,23 @@
-getgenv().OldAimPart = "HumanoidRootPart"
-getgenv().AimPart = "HumanoidRootPart"
-
-getgenv().AimlockKey = "t"
-getgenv().AimRadius = 70
-getgenv().ThirdPerson = true
-getgenv().FirstPerson = true
-getgenv().TeamCheck = false
-getgenv().PredictMovement = true
-getgenv().PredictionVelocity = 8
-getgenv().CheckIfJumped = true
-getgenv().Smoothness = false
-getgenv().SmoothnessAmount = 0.5
+local Aimlock = {
+    Enabled = false,
+    OldAimPart = "HumanoidRootPart",
+    AimPart = "HumanoidRootPart",
+    AimlockKey = "t",
+    AimRadius = 70,
+    ThirdPerson = true,
+    FirstPerson = true,
+    TeamCheck = false,
+    PredictMovement = true,
+    PredictionVelocity = 8,
+    CheckIfJumped = true,
+    Smoothness = false,
+    SmoothnessAmount = 0.5,
+    CanNotify = false, 
+}
 
 local Players, Uis, RService, SGui = game:GetService("Players"), game:GetService("UserInputService"), game:GetService("RunService"), game:GetService("StarterGui")
 local Client, Mouse, Camera, CF, RNew, Vec3, Vec2 = Players.LocalPlayer, Players.LocalPlayer:GetMouse(), workspace.CurrentCamera, CFrame.new, Ray.new, Vector3.new, Vector2.new
-local Aimlock, MousePressed, CanNotify = true, true, false
-local AimlockTarget
-local OldPre
+local AimlockTarget, MousePressed = nil, false
 
 getgenv().WorldToViewportPoint = function(P)
     return Camera:WorldToViewportPoint(P)
@@ -166,3 +167,9 @@ RService.RenderStepped:Connect(function()
         end
     end
 end)
+
+function ToggleAimlock()
+    Aimlock.Enabled = not Aimlock.Enabled
+    Aimlock:Toggle(Aimlock.Enabled)
+end
+
