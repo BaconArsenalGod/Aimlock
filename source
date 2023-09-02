@@ -2139,7 +2139,7 @@ local themes = {
 local Settings = {
     SilentAim = false,
     Aimbot = false,
-    Prediction = 0.178,
+    Prediction = 0.198,
     Smoothness = false
 }
 
@@ -2458,7 +2458,7 @@ ALTab:AddSlider("Hitchance", function(value)
     Settings.Prediction = tonumer("0." .. value)
 end, {
     ["min"] = 0,
-    ["max"] = 400,
+    ["max"] = 500,
     ["readonly"] = false,
 })
 
