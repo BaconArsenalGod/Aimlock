@@ -83,60 +83,17 @@ function ESP:Add(obj, options)
     if self:GetBox(obj) then
         self:GetBox(obj):Remove()
     end
-
-    box.Components["Highlight"] = Draw("Quad", {
-        Thickness = self.Thickness,
-        Color = self.HighlightColor, -- Set the initial highlight color
-        Transparency = 0.5, -- You can adjust the transparency as needed
-        Filled = true, -- Change to true if you want a filled highlight
-        Visible = self.Enabled and self.Highlighted == obj -- Only show the highlight when it's highlighted
-    })
     
     self.Objects[obj] = highlight
 
-    if self:GetBox(obj) then
-        self:GetBox(obj):Remove()
-    end
-
-    box.Components["Quad"] = Draw("Quad", {
-        Thickness = self.Thickness,
-        Color = color,
-        Transparency = 1,
-        Filled = false,
-        Visible = self.Enabled and self.Boxes
-    })
-    box.Components["Name"] = Draw("Text", {
-		Text = box.Name,
-		Color = box.Color,
-		Center = true,
-		Outline = true,
-        Size = 19,
-        Visible = self.Enabled and self.Names
-	})
-	box.Components["Distance"] = Draw("Text", {
-		Color = box.Color,
-		Center = true,
-		Outline = true,
-        Size = 19,
-        Visible = self.Enabled and self.Names
-	})
-	
-	box.Components["Tracer"] = Draw("Line", {
-		Thickness = ESP.Thickness,
-		Color = box.Color,
-        Transparency = 1,
-        Visible = self.Enabled and self.Tracers
-    })
-    self.Objects[obj] = box
-    
     obj.AncestryChanged:Connect(function(_, parent)
         if parent == nil and ESP.AutoRemove ~= false then
-            box:Remove()
+            highlight:Remove()
         end
     end)
     obj:GetPropertyChangedSignal("Parent"):Connect(function()
         if obj.Parent == nil and ESP.AutoRemove ~= false then
-            box:Remove()
+            highlight:Remove()
         end
     end)
 
@@ -144,7 +101,7 @@ function ESP:Add(obj, options)
 	if hum then
         hum.Died:Connect(function()
             if ESP.AutoRemove ~= false then
-                box:Remove()
+                highlight:Remove()
             end
 		end)
     end
