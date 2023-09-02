@@ -168,8 +168,4 @@ RService.RenderStepped:Connect(function()
     end
 end)
 
-function ToggleAimlock()
-    Aimlock.Enabled = not Aimlock.Enabled
-    Aimlock:Toggle(Aimlock.Enabled)
-end
 
