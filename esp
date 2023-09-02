@@ -13,7 +13,7 @@ local plr = plrs.LocalPlayer
 -- Functions
 local function Draw(obj, props)
     local new = Drawing.new(obj)
-    
+
     props = props or {}
     for i, v in pairs(props) do
         new[i] = v
@@ -100,11 +100,13 @@ end
 
 local function CharAdded(char)
     local p = plrs:GetPlayerFromCharacter(char)
-    ESP:Add(char, {
-        Name = p.Name,
-        Player = p,
-        PrimaryPart = char:FindFirstChild("HumanoidRootPart") or nil,
-    })
+    if p and p ~= plr then -- Check if the character belongs to a player other than the local player
+        ESP:Add(char, {
+            Name = p.Name,
+            Player = p,
+            PrimaryPart = char:FindFirstChild("HumanoidRootPart") or nil,
+        })
+    end
 end
 
 local function PlayerAdded(p)
