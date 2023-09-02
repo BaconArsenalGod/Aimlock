@@ -135,8 +135,8 @@ RService.RenderStepped:Connect(function()
         else
             CanNotify = false
         end
-    end
-    if Aimlock == true and MousePressed == true then
+        if getgenv().Aimlock.Enabled == true and MousePressed == true then
+
         if AimlockTarget and AimlockTarget.Character and AimlockTarget.Character:FindFirstChild(getgenv().AimPart) then
             if getgenv().FirstPerson == true then
                 if CanNotify == true then
