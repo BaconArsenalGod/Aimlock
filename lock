@@ -168,4 +168,10 @@ RService.RenderStepped:Connect(function()
     end
 end)
 
-
+function Aimlock:Slider(value)
+    -- Make sure Aimlock is accessible
+    if getgenv().Aimlock then
+        -- Update AimRadius in the Aimlock table
+        getgenv().Aimlock.AimRadius = value
+    end
+end
