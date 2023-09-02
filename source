@@ -2024,14 +2024,13 @@ local Window = library:AddWindow("Brennen Assist", {
     can_resize = true,
 })
 
-local Aiming = loadstring(game:HttpGet("https://raw.githubusercontent.com/farthefarter/e/main/e"))()
-local Aimlock = loadstring(game:HttpGet("https://raw.githubusercontent.com/BaconArsenalGod/Aimlock/main/lock"))()
+local Aiming = loadstring(game:HttpGet("https://raw.githubusercontent.com/BaconArsenalGod/Aimlock/main/lock"))()
 local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/BaconArsenalGod/Aimlock/main/esp"))()
 ESP:Toggle(true)
 ESP.Highlight = true
 Aiming.TeamCheck(false)
 Aiming.VisibleCheck = false
-
+Aiming.FOVColour(color)
 
 
 -- // Dependencies
@@ -2092,8 +2091,6 @@ local TpsTab = Window:AddTab("Tps")
 local CreditTAB = Window:AddTab("Credits")
 
 local folder = TpsTab:AddFolder("Tps")
-
-
 
 
 folder:AddButton("Tactical Mili", function(bool)
@@ -2281,9 +2278,13 @@ end)
 Fly()
 end)
 
-RCTab:AddTextBox("Fov Camera", function(text)
-	workspace.CurrentCamera.FieldOfView = (text)
-end)
+RCTab:AddSlider("Fov Camera", function(value)
+	workspace.CurrentCamera.FieldOfView = (value)
+end,{
+		["min"] = 0,
+		["max"] = 120,
+		["readonly"] = false
+	})
 
 RCTab:AddButton("Headless", function(bool)
 game.Players.LocalPlayer.Character.Head.Transparency = 1
@@ -2292,6 +2293,36 @@ if (v:IsA("Decal")) then
 v:Destroy()
 end
 end
+end)
+
+RCTab:AddSwitch("fake macro|z|", function(bool)
+plr = game:GetService('Players').LocalPlayer
+down = true
+ 
+function onButton1Down(mouse)
+    down = true
+    while down do
+        if not down then break end
+        local char = plr.Character
+        char.HumanoidRootPart.Velocity = char.HumanoidRootPart.CFrame.lookVector * 190
+        wait()
+    end
+end
+ 
+function onButton1Up(mouse)
+    down = false
+end
+ 
+function onSelected(mouse)
+    mouse.KeyDown:connect(function(z) if z:lower()=="z"then onButton1Down(mouse)end end)
+    mouse.KeyUp:connect(function(z) if z:lower()=="z"then onButton1Up(mouse)end end)
+end
+onSelected(game.Players.LocalPlayer:GetMouse())
+game.StarterGui:SetCore("SendNotification",{
+			Title = "Enabled";
+			Text = "Brennen Assist 😈";
+			Duration = 0.20;
+		})
 end)
 
 RCTab:AddButton("Korblox", function(bool)
@@ -2352,6 +2383,10 @@ end, {
     ["max"] = 400,
     ["readonly"] = false,
 })
+local ALTab = Tab:AddColorPicker(function(color)
+	Aiming.FOVColor(color)
+end)
+ALTab:Set(Color3.new(1, 0, 0))
 
 ALTab:AddSlider("Hitchance", function(value)
     Settings.Prediction = tonumer("0." .. value)
