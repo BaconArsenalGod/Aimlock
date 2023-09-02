@@ -1,3 +1,6 @@
+
+
+-- Define Aimlock as a global variable
 getgenv().Aimlock = {
     Enabled = false,
     OldAimPart = "HumanoidRootPart",
@@ -15,10 +18,13 @@ getgenv().Aimlock = {
     CanNotify = false, 
 }
 
-local Players, Uis, RService, SGui = game:GetService("Players"), game:GetService("UserInputService"), game:GetService("RunService"), game:GetService("StarterGui")
-local Client, Mouse, Camera, CF, RNew, Vec3, Vec2 = Players.LocalPlayer, Players.LocalPlayer:GetMouse(), workspace.CurrentCamera, CFrame.new, Ray.new, Vector3.new, Vector2.new
-local AimlockTarget, MousePressed = nil, false
+    local Players, Uis, RService, SGui = game:GetService"Players", game:GetService"UserInputService", game:GetService"RunService", game:GetService"StarterGui";
+    local Client, Mouse, Camera, CF, RNew, Vec3, Vec2 = Players.LocalPlayer, Players.LocalPlayer:GetMouse(), workspace.CurrentCamera, CFrame.new, Ray.new, Vector3.new, Vector2.new;
+    local Aimlock, MousePressed, CanNotify = true, false, false;
+    local AimlockTarget;
+    local OldPre;
 
+-- Define the WorldToViewportPoint and WorldToScreenPoint functions...
 getgenv().WorldToViewportPoint = function(P)
     return Camera:WorldToViewportPoint(P)
 end
@@ -26,6 +32,7 @@ end
 getgenv().WorldToScreenPoint = function(P)
     return Camera.WorldToScreenPoint(Camera, P)
 end
+
 
 getgenv().GetObscuringObjects = function(T)
     if T and T:FindFirstChild(getgenv().AimPart) and Client and Client.Character:FindFirstChild("Head") then
@@ -35,6 +42,7 @@ getgenv().GetObscuringObjects = function(T)
         if RayPos then return RayPos:IsDescendantOf(T) end
     end
 end
+
 
 getgenv().GetNearestTarget = function()
     local players = {}
@@ -157,17 +165,8 @@ RService.RenderStepped:Connect(function()
             end
         end
     end
-    if getgenv().CheckIfJumped then
-        if AimlockTarget and AimlockTarget.Character and AimlockTarget.Character:FindFirstChild("Humanoid") then
-            if AimlockTarget.Character.Humanoid:GetState() == Enum.HumanoidStateType.Physics then
-                getgenv().AimPart = "UpperTorso"
-            else
-                getgenv().AimPart = getgenv().OldAimPart
-            end
-        end
-    end
-end)
 
+-- Define the Aimlock:Slider function to update AimRadius
 function Aimlock:Slider(value)
     -- Make sure Aimlock is accessible
     if getgenv().Aimlock then
@@ -175,3 +174,14 @@ function Aimlock:Slider(value)
         getgenv().Aimlock.AimRadius = value
     end
 end
+
+if getgenv().CheckIfJumped then
+    if AimlockTarget and AimlockTarget.Character and AimlockTarget.Character:FindFirstChild("Humanoid") then
+        if AimlockTarget.Character.Humanoid:GetState() == Enum.HumanoidStateType.Physics then
+            getgenv().AimPart = "UpperTorso"
+        else
+            getgenv().AimPart = getgenv().OldAimPart
+        end
+    end
+end
+end)
