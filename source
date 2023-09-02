@@ -2109,10 +2109,12 @@ local Aiming = loadstring(game:HttpGet("https://raw.githubusercontent.com/farthe
 local Aimlock = loadstring(game:HttpGet("https://raw.githubusercontent.com/BaconArsenalGod/Aimlock/main/lock"))()
 local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/BaconArsenalGod/Aimlock/main/esp"))()
 ESP:Toggle(false)
-ESP.Highlight = true
+ESP.Highlight = false
 Aiming.TeamCheck(false)
 Aiming.VisibleCheck = false
-Aimlock:Toggle(false)
+Aimlock.AimRadius = 80
+
+
 
 -- // Dependencies
 
@@ -2422,7 +2424,6 @@ end)
 
 AimTab:AddSwitch("Aimlock (t)", function(bool)
     Settings.Aimlock = bool
-	Aimlock:Toggle(bool)
 end)
 
 ALTab:AddSwitch("Webhook Mode", function(bool)
@@ -2478,23 +2479,8 @@ AimTab:AddSlider("AimRadius", function(value)
         ["readonly"] = false
     }
 end)
-AimTab:AddSlider("SmoothnessAmount", function(value)
-    Aimlock.SmoothnessAmount = value
-    {
-        ["min"] = 1,
-        ["max"] = 10,
-        ["readonly"] = true
-    }
-end)
-AimTab:AddSwitch("Smoothness", function(bool)
-    Aimlock.Smoothness = bool 
-end)
 
-function Smoothness.Check()
-    if Aimlock.Smoothness == false then 
-        Aimlock.Smoothness = true 
-    end
-end
+
 
 -- // Overwrite to account downed
 function Aiming.Check()
