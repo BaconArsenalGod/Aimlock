@@ -2016,89 +2016,8 @@ function library:AddWindow(title, options)
 	return window_data, Window
 end
 
-do -- Example UI
-	local Window = library:AddWindow("Preview", {
-		main_color = Color3.fromRGB(41, 74, 122),
-		min_size = Vector2.new(500, 600),
-		toggle_key = Enum.KeyCode.RightShift,
-		can_resize = true,
-	})
-	local Tab = Window:AddTab("Tab 1")
 
-	do -- Elements
-		Tab:AddLabel("Hello World!")
-
-		Tab:AddButton("Button", function()
-			print("Button clicked.")
-		end)
-
-		Tab:AddTextBox("TextBox", function(text)
-			print(text)
-		end, {
-			["clear"] = false, -- Default: true (options are optional)
-		})
-
-		local Switch = Tab:AddSwitch("Switch", function(bool)
-			print(bool)
-		end)
-		Switch:Set(true)
-
-		local Slider = Tab:AddSlider("Slider", function(x)
-			print(x)
-		end, { -- (options are optional)
-			["min"] = 0, -- Default: 0
-			["max"] = 100, -- Default: 100
-			["readonly"] = false, -- Default: false
-		})
-		Slider:Set(50)
-
-		Tab:AddKeybind("Keybind", function(key)
-			print(key)
-		end, { -- (options are optional)
-			["standard"] = Enum.KeyCode.RightShift -- Default: RightShift
-		})
-
-		local Dropdown = Tab:AddDropdown("Dropdown", function(object)
-			print(object)
-		end)
-		for i = 1, 9 do
-			Dropdown:Add(tostring(i))
-		end
-		local obj = Dropdown:Add("10")
-		obj:Remove()
-
-		local CP = Tab:AddColorPicker(function(color)
-			print(color)
-		end)
-		CP:Set(Color3.new(1, 0, 0))
-
-		local Console = Tab:AddConsole({
-			["y"] = 100,
-			["source"] = "Lua",
-		})
-		Console:Set("-- Gamer time!\nfor i = 1, 9 do \n    print(i)\nend")
-		print(Console:Get())
-
-		local HA = Tab:AddHorizontalAlignment()
-		HA:AddButton("Execute", function()
-			loadstring(Console:Get())()
-		end)
-		HA:AddButton("Clear", function()
-			Console:Set("")
-		end)
-
-		local Folder = Tab:AddFolder("Folder") -- This can contain exactly the same as a Tab. You can have as many folders as you'd like to.
-		Folder:AddLabel("Hello")
-		local Folder2 = Folder:AddFolder("?")
-		Folder2:AddLabel("Woo!")
-
-	end
-
-	Tab:Show()
-	library:FormatWindows()
-end
-
-local Window = library:AddWindow("Skid Assist", {
+local Window = library:AddWindow("Brennen Assist", {
     main_color = Color3.fromRGB(27, 42, 53),
     min_size = Vector2.new(450, 500),
     toggle_key = Enum.KeyCode.V,
@@ -2108,11 +2027,10 @@ local Window = library:AddWindow("Skid Assist", {
 local Aiming = loadstring(game:HttpGet("https://raw.githubusercontent.com/farthefarter/e/main/e"))()
 local Aimlock = loadstring(game:HttpGet("https://raw.githubusercontent.com/BaconArsenalGod/Aimlock/main/lock"))()
 local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/BaconArsenalGod/Aimlock/main/esp"))()
-ESP:Toggle(false)
-ESP.Highlight = false
+ESP:Toggle(true)
+ESP.Highlight = true
 Aiming.TeamCheck(false)
 Aiming.VisibleCheck = false
-Aimlock.AimRadius = 80
 
 
 
@@ -2142,7 +2060,7 @@ local Settings = {
     SilentAim = false,
     Aimbot = false,
     Prediction = 0.178,
-    Smoothness = false
+    Aimlock = false
 }
 
 getgenv().Settings = Settings
@@ -2158,8 +2076,8 @@ end
 local bindableFunction= Instance.new("BindableFunction")
 
 game.StarterGui:SetCore("SendNotification", {
-    Title = "Skkid v4";
-    Text = "Welcome";
+    Title = "Brennen v4";
+    Text = "Welcome, Private User";
     Icon = "RBXID OR BLANK";
     Duration = "10";
     callbakc = bindableFunction;
@@ -2402,18 +2320,6 @@ ESPTab:AddSwitch("Enable ESP", function(bool)
     ESP:Toggle(bool)
 end)
 
-ESPTab:AddSwitch("Enable Tracers", function(bool)
-    ESP.Tracers = bool
-end)
-
-ESPTab:AddSwitch("Enable Names", function(bool)
-    ESP.Names = bool
-end)
-
-ESPTab:AddSwitch("Enable Boxes", function(bool)
-    ESP.Boxes = bool
-end)
-
 ALTab:AddSwitch("Silent Aim", function(bool)
     Settings.SilentAim = bool
 end)
@@ -2422,22 +2328,14 @@ ALTab:AddSwitch("Aimbot", function(bool)
     Settings.Aimbot = bool
 end)
 
-AimTab:AddSwitch("Aimlock (t)", function(bool)
+AimTab:AddSwitch("Aimlock (t)-- does not work rn currently being worked on", function(bool)
     Settings.Aimlock = bool
 end)
 
-ALTab:AddSwitch("Webhook Mode", function(bool)
-    Settings.Webh = bool
-end)
 
 ALTab:AddSwitch("Notification Mode", function(bool)
     Settings.Not = bool
 end)
-
-ALTab:AddSwitch("Copy Mode", function(bool)
-    Settings.Cop = bool
-end)
-
 
 ALTab:AddSwitch("Predict Lag", function(bool)
     Settings.Prediction.Lag = bool
@@ -2471,14 +2369,7 @@ ALTab:AddSwitch("Hit all Airshots", function(bool)
     Aiming.Airshots = true
 end)
 --AIMLOCK TAB
-AimTab:AddSlider("AimRadius", function(value)
-    Aimlock.AimRadius = value
-    {
-        ["min"] = 0,
-        ["max"] = 200,
-        ["readonly"] = false
-    }
-end)
+
 
 
 
@@ -2540,6 +2431,7 @@ UserInputService.InputEnded:Connect(function(Key, Is)
 end)
 
 
+
 -- // Aimbot
 RunService:BindToRenderStep("Aimbot", 0, function()
     if (Settings.Aimbot and Aiming.Check() and test) then
@@ -2553,4 +2445,5 @@ RunService:BindToRenderStep("Aimbot", 0, function()
         CurrentCamera.CFrame = CFrame.lookAt(CurrentCamera.CFrame.Position, Hit.Position)
     end
 end)
+
 
