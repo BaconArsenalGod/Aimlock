@@ -1,9 +1,8 @@
 -- Settings
 local ESP = {
     Enabled = false,
-    Highlight = true, -- Change to enable highlighting
-    HighlightColor = Color3.fromRGB(255, 0, 0), -- Set the highlight color
-    Objects = setmetatable({}, {__mode="kv"}),
+    HighlightColor = Color3.fromRGB(255, 0, 0),
+    Objects = {},
 }
 
 -- Declarations
@@ -24,11 +23,9 @@ end
 
 function ESP:Toggle(bool)
     self.Enabled = bool
-    if not bool then
-        for obj, highlight in pairs(self.Objects) do
-            if highlight.Type == "Highlight" then
-                highlight:Remove()
-            end
+    for _, highlight in pairs(self.Objects) do
+        if highlight.Type == "Highlight" then
+            highlight.Component.Visible = bool
         end
     end
 end
@@ -37,7 +34,6 @@ local highlightBase = {}
 highlightBase.__index = highlightBase
 
 function highlightBase:Remove()
-    ESP.Objects[self.Object] = nil
     self.Component.Visible = false
 end
 
@@ -47,7 +43,6 @@ function highlightBase:Update()
         return
     end
 
-    -- Update the highlight position and color
     local cf = self.PrimaryPart.CFrame
     local position, visible = cam:WorldToViewportPoint(cf.p)
     if visible then
@@ -67,43 +62,37 @@ function ESP:Add(obj, options)
     local highlight = setmetatable({
         Name = options.Name or obj.Name,
         Type = "Highlight",
-        Color = options.Color or self.HighlightColor, -- Set the initial highlight color
+        Color = options.Color or self.HighlightColor,
         Object = obj,
         PrimaryPart = options.PrimaryPart or obj:IsA("BasePart") and obj or nil,
         Component = Draw("Circle", {
             Thickness = 2,
             NumSides = 50,
-            Radius = options.Radius or (obj:IsA("BasePart") and obj.Size.magnitude or 5), -- You can adjust the radius
+            Radius = options.Radius or (obj:IsA("BasePart") and obj.Size.magnitude or 5),
             Filled = false,
             Color = self.HighlightColor,
-            Visible = false,
+            Visible = self.Enabled,
         }),
     }, highlightBase)
 
-    if self:GetBox(obj) then
-        self:GetBox(obj):Remove()
-    end
-    
     self.Objects[obj] = highlight
 
     obj.AncestryChanged:Connect(function(_, parent)
-        if parent == nil and ESP.AutoRemove ~= false then
+        if parent == nil then
             highlight:Remove()
         end
     end)
     obj:GetPropertyChangedSignal("Parent"):Connect(function()
-        if obj.Parent == nil and ESP.AutoRemove ~= false then
+        if obj.Parent == nil then
             highlight:Remove()
         end
     end)
 
     local hum = obj:FindFirstChildOfClass("Humanoid")
-	if hum then
+    if hum then
         hum.Died:Connect(function()
-            if ESP.AutoRemove ~= false then
-                highlight:Remove()
-            end
-		end)
+            highlight:Remove()
+        end)
     end
 
     return highlight
@@ -111,45 +100,34 @@ end
 
 local function CharAdded(char)
     local p = plrs:GetPlayerFromCharacter(char)
-    if not char:FindFirstChild("HumanoidRootPart") then
-        local ev
-        ev = char.ChildAdded:Connect(function(c)
-            if c.Name == "HumanoidRootPart" then
-                ev:Disconnect()
-                ESP:Add(char, {
-                    Name = p.Name,
-                    Player = p,
-                    PrimaryPart = c
-                })
-            end
-        end)
-    else
-        ESP:Add(char, {
-            Name = p.Name,
-            Player = p,
-            PrimaryPart = char.HumanoidRootPart
-        })
-    end
+    ESP:Add(char, {
+        Name = p.Name,
+        Player = p,
+        PrimaryPart = char:FindFirstChild("HumanoidRootPart") or nil,
+    })
 end
+
 local function PlayerAdded(p)
     p.CharacterAdded:Connect(CharAdded)
     if p.Character then
-        coroutine.wrap(CharAdded)(p.Character)
+        CharAdded(p.Character)
     end
 end
+
 plrs.PlayerAdded:Connect(PlayerAdded)
-for i,v in pairs(plrs:GetPlayers()) do
-    if v ~= plr then
-        PlayerAdded(v)
+for _, player in pairs(plrs:GetPlayers()) do
+    if player ~= plr then
+        PlayerAdded(player)
     end
 end
 
 game:GetService("RunService").RenderStepped:Connect(function()
-    cam = workspace.CurrentCamera
-    for i,v in (ESP.Enabled and pairs or ipairs)(ESP.Objects) do
-        if v.Update then
-            local s,e = pcall(v.Update, v)
-            if not s then warn("[EU]", e, v.Object:GetFullName()) end
+    for _, highlight in pairs(ESP.Objects) do
+        if highlight.Type == "Highlight" and highlight.Update then
+            local success, error = pcall(highlight.Update, highlight)
+            if not success then
+                warn("[ESP Update Error]", error)
+            end
         end
     end
 end)
