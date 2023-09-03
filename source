@@ -218,11 +218,11 @@ Aiming:CreateToggle({
 Aiming:CreateSlider({
     Name = "FOV Size"; 
     Flag = "FOV Size Level";
-    Min = 0;
-    Max = 300; 
+    Min = 1;
+    Max = 100; 
     AllowOutOfRange = false;
     Digits = 0; 
-    Default = 50; 
+    Default = 20; 
     Callback = function(newValue)
         Aiming.FOV = (newValue)
     end;
