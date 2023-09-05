@@ -1,8 +1,6 @@
 
 
-local VERSION = "1.2"
-
--- LURAPH (if i left it enabled)
+local VERSION = "1"
 if not LPH_OBFUSCATED then
     local function r(...)
         return ...
@@ -3799,7 +3797,7 @@ do
             end)
     
             input.FocusLost:Connect(function(enterPressed)
-                local newValue
+                local bool
                 if enterPressed then
                     local text = input.Text
                     local num = tonumber(text)
@@ -3808,8 +3806,8 @@ do
                             num = math.clamp(num,info.Min,info.Max)
                         end
                         input.Text = utility:FormatNumber(num,info.Digits)
-                        newValue = num
-                        _self.Flags[info.Flag] = newValue
+                        bool = num
+                        _self.Flags[info.Flag] = bool
                     else
                         input.Text = _last_text
                     end
@@ -4211,7 +4209,7 @@ do
             end)
     
             input.FocusLost:Connect(function(enterPressed)
-                local newValue
+                local bool
                 if enterPressed then
                     local text = input.Text
                     local num = tonumber(text)
@@ -4220,8 +4218,8 @@ do
                             num = math.clamp(num,info.Min,info.Max)
                         end
                         input.Text = utility:FormatNumber(num,info.Digits)
-                        newValue = num
-                        _self.Flags[info.SliderFlag] = newValue
+                        bool = num
+                        _self.Flags[info.SliderFlag] = bool
                     else
                         input.Text = _last_text
                     end
